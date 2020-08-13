@@ -7,7 +7,6 @@ class IndexPage(TemplateView):
     # template_name = 'index.html'
 
     def get(self, request, **kwargs):
-
         article_data = []
         all_articles = Article.objects.all().order_by('-created_at')[:9]
 
@@ -19,8 +18,26 @@ class IndexPage(TemplateView):
                 'created_at': article.created_at.date,
             })
 
+        promote_data = []
+        all_promote_article = Article.objects.filter(promote=True)
+        for promote_article in all_promote_article:
+            promote_data.append({
+                'title': promote_article.title,
+                'cover': promote_article.cover.url,
+                'category': promote_article.category.title,
+                'created_at': promote_article.created_at.date,
+                'author': promote_article.author.user.first_name + ' ' + promote_article.author.user.last_name,
+                'avatar': promote_article.author.avatar.url if promote_article.author.avatar else None,
+
+            })
+
         context = {
-            'article_data': article_data
+            'article_data': article_data,
+            'promote_data': promote_data,
         }
 
         return render(request, 'index.html', context)
+
+
+class ContactPage(TemplateView):
+    template_name = 'contact.html'
